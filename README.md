@@ -1,95 +1,57 @@
-# 7z DLL 改造项目 README
+# 7z DLL Modification Project README
+## I. Project Overview
+This project is developed based on the 7z 2201 version. Its goal is to transform the main compilation product of the original project from an exe into a dll, facilitating integration into other projects. By creating the `Extract7z` class and providing the `Unzip7zPath` export function, it enables the extraction of 7z files and can callback the extraction progress information, allowing users to monitor the extraction status in real - time.
 
-## 一、项目概述
-
-本项目基于 7z 2201 版本进行开发，旨在将原项目主要生成的 exe 编译产物改造为 dll，以方便在其他项目中集成使用。通过创建 `Extract7z` 类并提供 `Unzip7zPath` 导出函数，实现了对 7z 文件的解压功能，并能够回调解压进度信息，让使用者可以实时掌握解压状态。
-
-## 二、功能介绍
-
-**解压函数**：
-
+## II. Function Introduction
+### Extraction Function
 `bool Extract7z::Unzip7zPath(const WCHAR* dllPath, const WCHAR* zipPath, const WCHAR* destDir, const CProgressCallback* callback, std::vector<std::wstring>* pFileList, int fromProgress, int toProgres)`
+#### Parameter Explanation
+- `dllPath`: A wide - character pointer pointing to the current dll file path, used for loading related dependencies, etc.
+- `zipPath`: The path of the 7z file to be extracted, passed in as a wide - character string.
+- `destDir`: The path of the extraction target directory, specifying the location where the extracted files will be stored.
+- `callback`: A pointer to the progress callback function, used to feedback the extraction progress to the caller. The callback function should follow the specifications defined by `CProgressCallback` to accurately receive and process progress data.
+- `pFileList`: A pointer to `std::vector<std::wstring>`, used to store the file list information during the extraction process, facilitating subsequent operations to know the details of the extracted files.
+- `fromProgress`: The starting value of the progress range, used to set the starting point of the progress feedback, which can be flexibly coordinated with the overall progress logic.
+- `toProgres`: The ending value of the progress range, defining the end point of the extraction progress feedback.
+#### Return Value
+Returns `true` if the extraction is successful, otherwise `false`.
 
-参数说明：
-
-`dllPath`：指向当前 dll 文件路径的宽字符指针，用于加载相关依赖等。
-
-`zipPath`：待解压的 7z 文件的路径，以宽字符形式传入。
-
-`destDir`：解压目标目录路径，指定解压后的文件存放位置。
-
-`callback`：指向进度回调函数的指针，用于向调用者反馈解压进度。回调函数应遵循 `CProgressCallback` 定义的规范，以便准确接收和处理进度数据。
-
-`pFileList`：一个指向 `std::vector<std::wstring>` 的指针，用于存储解压过程中文件列表信息，方便后续操作知晓解压出的文件详情。
-
-`fromProgress`：进度区间起始值，用于设定进度反馈的起始点，可灵活配合整体进度逻辑。
-
-`toProgres`：进度区间结束值，界定解压进度反馈的终点。
-
-返回值：成功解压返回 `true`，否则返回 `false`。
-
-## 三、使用方法
-
-引入头文件：在使用本 dll 的项目中，需引入包含 `Extract7z` 类声明的头文件，确保编译器能够识别相关类型和函数签名。
-
-链接 dll：将生成的 dll 文件与项目进行链接，不同开发环境有不同的链接配置方式，例如在 Visual Studio 中，需在项目属性的链接器设置里指定 dll 的路径。
-
-调用解压函数：按照 `Unzip7zPath` 函数参数要求，准备好相应的路径、回调函数等，即可发起解压操作。示例代码如下：
-
-
-
-```
+## III. Usage Instructions
+1. **Include the Header File**: In the project using this dll, you need to include the header file containing the declaration of the `Extract7z` class to ensure that the compiler can recognize the relevant types and function signatures.
+2. **Link the DLL**: Link the generated dll file with the project. Different development environments have different link configuration methods. For example, in Visual Studio, you need to specify the dll path in the linker settings of the project properties.
+3. **Call the Extraction Function**: Prepare the corresponding paths, callback functions, etc. according to the parameter requirements of the `Unzip7zPath` function, and then you can initiate the extraction operation. The sample code is as follows:
+```cpp
 #include "Extract7z.h"
-
-// 假设已经实现了合适的进度回调函数 CProgressCallback myCallback;
-
+// Assume that a suitable progress callback function CProgressCallback myCallback has been implemented;
 int main() {
-
-   const WCHAR* dllPath = L"path/to/your/dll";
-
-   const WCHAR* zipPath = L"path/to/your/7z/file.7z";
-
-   const WCHAR* destDir = L"destination/directory";
-
-   std::vector<std::wstring> fileList;
-
-   bool result = Extract7z::Unzip7zPath(dllPath, zipPath, destDir, &myCallback, &fileList, 10, 98);
-
-   if (result) {
-
-       // 解压成功后的处理逻辑
-
-   } else {
-
-       // 解压失败处理
-
-   }
-
-   return 0;
-
+    const WCHAR* dllPath = L"path/to/your/dll";
+    const WCHAR* zipPath = L"path/to/your/7z/file.7z";
+    const WCHAR* destDir = L"destination/directory";
+    std::vector<std::wstring> fileList;
+    bool result = Extract7z::Unzip7zPath(dllPath, zipPath, destDir, &myCallback, &fileList, 10, 98);
+    if (result) {
+        // Processing logic after successful extraction
+    } else {
+        // Processing for extraction failure
+    }
+    return 0;
 }
 ```
 
-## 四、注意事项
+## IV. Precautions
+1. **Compatibility**: Since this project is modified based on the 7z 2201 version, when using it, ensure the compatibility of the target environment with this version, especially when it comes to the collaborative work of system - level dependencies and other libraries.
+2. **Callback Function Stability**: The progress callback function provided by the user should be stable. Avoid exceptions during the callback process that may cause the extraction to be interrupted or the program to crash. It is recommended to conduct sufficient error handling inside the callback function.
+3. **Path Correctness**: The dll path, 7z file path, and target extraction directory path passed in must be accurate. Otherwise, it will lead to problems such as extraction failure or incorrect file storage.
 
-兼容性：由于本项目基于 7z 2201 版本改造，在使用时需确保目标环境与该版本的兼容性，尤其是涉及到系统底层依赖和其他库的协同工作时。
+## V. Future Plans
+1. Further optimize the extraction performance. We may explore multi - thread extraction and other technologies to improve the extraction speed of large 7z files.
+2. Improve the error - handling mechanism, provide more detailed error codes or error messages to help users accurately locate the root cause of problems.
 
-回调函数稳定性：使用者提供的进度回调函数应保证稳定性，避免在回调过程中出现异常导致解压中断或程序崩溃，建议在回调函数内部进行充分的错误处理。
+We welcome all developers to use this project. If you encounter problems or have improvement suggestions, please feel free to submit issues or pull requests in the project repository.
 
-路径正确性：传入的 dll 路径、7z 文件路径和目标解压目录路径务必准确，否则将导致解压失败或文件存放错误等问题。
+## VI. License Information
+This project follows the 7z license agreement. 7z uses the GNU LGPL (Lesser General Public License). The core points are as follows:
+1. You can freely use, modify, and distribute this software, whether in source code form or binary form. However, if you modify the software and distribute the modified version, you must disclose the modified source code to ensure that others can also benefit from these modifications and can continue to freely improve the software.
+2. For applications developed using this software, if the application only statically or dynamically links to this software library, the application can choose to follow the LGPL license or use a more permissive license for distribution. But if you modify this software library and distribute the modified version as part of the application, the entire application must follow the LGPL license and disclose the modified source code.
 
-## 五、后续计划
-
-进一步优化解压性能，可能探索多线程解压等技术，提高大型 7z 文件的解压速度。
-
-完善错误处理机制，提供更详细的错误码或错误信息，方便使用者精准定位问题根源。
-
-欢迎各位开发者使用本项目，如果遇到问题或有改进建议，请随时在项目仓库提交 issue 或 pull request。
-
-## 六、许可证信息（License）
-本项目遵循 7z 的许可证协议。7z 使用的是 GNU LGPL（Lesser General Public License）许可证，其核心要点如下：
-
-1. 您可以自由使用、修改和分发本软件，无论是以源代码形式还是二进制形式。但如果您对软件进行了修改，并且分发修改后的版本，您必须公开修改后的源代码，以保证其他人也能够受益于这些修改，并能够继续自由地对软件进行改进。
-2. 对于使用本软件开发的应用程序，如果应用程序只是静态链接或者动态链接到本软件库，那么该应用程序可以选择遵循 LGPL 许可证，或者采用更宽松的许可证分发。但如果您对本软件库进行了修改，并且将修改后的版本作为应用程序的一部分进行分发，那么整个应用程序必须遵循 LGPL 许可证，并且公开修改后的源代码。
-
-详细的许可证文本可参考 [官方 7z 许可证文档](https://www.7-zip.org/license.txt)，请确保在使用本项目时，您的行为符合相关的许可规定，以避免潜在的法律问题。
+For the detailed license text, please refer to the [official 7z license document](https://www.7-zip.org/license.txt). Please ensure that your actions comply with the relevant license regulations when using this project to avoid potential legal issues. 
