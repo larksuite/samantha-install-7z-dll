@@ -39,33 +39,33 @@
 
 
 ```
-\#include "Extract7z.h"
+#include "Extract7z.h"
 
 // 假设已经实现了合适的进度回调函数 CProgressCallback myCallback;
 
 int main() {
 
-&#x20;   const WCHAR\* dllPath = L"path/to/your/dll";
+   const WCHAR* dllPath = L"path/to/your/dll";
 
-&#x20;   const WCHAR\* zipPath = L"path/to/your/7z/file.7z";
+   const WCHAR* zipPath = L"path/to/your/7z/file.7z";
 
-&#x20;   const WCHAR\* destDir = L"destination/directory";
+   const WCHAR* destDir = L"destination/directory";
 
-&#x20;   std::vector\<std::wstring> fileList;
+   std::vector<std::wstring> fileList;
 
-&#x20;   bool result = Extract7z::Unzip7zPath(dllPath, zipPath, destDir, \&myCallback, \&fileList, 0, 100);
+   bool result = Extract7z::Unzip7zPath(dllPath, zipPath, destDir, &myCallback, &fileList, 10, 98);
 
-&#x20;   if (result) {
+   if (result) {
 
-&#x20;       // 解压成功后的处理逻辑
+       // 解压成功后的处理逻辑
 
-&#x20;   } else {
+   } else {
 
-&#x20;       // 解压失败处理
+       // 解压失败处理
 
-&#x20;   }
+   }
 
-&#x20;   return 0;
+   return 0;
 
 }
 ```
